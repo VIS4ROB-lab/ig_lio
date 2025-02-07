@@ -92,7 +92,6 @@ class IG_LIO_NODE : public rclcpp::Node {
     while (rclcpp::ok() && !FLAG_EXIT.load()) {
       Process();  // Your processing function
       rate.sleep();
-      timer.PrintAll();
     }
     rclcpp::shutdown();
   }
@@ -925,6 +924,8 @@ class IG_LIO_NODE : public rclcpp::Node {
     // } else {
     //   delay_count++;
     // }
+
+    timer.PrintAll();
   }
 
   static void SigHandle(int sig) {
