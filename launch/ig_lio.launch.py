@@ -15,7 +15,7 @@ from launch.conditions import IfCondition
 def generate_launch_description():
     package_path = get_package_share_directory('ig_lio')
     default_rviz_config_path = os.path.join(
-        package_path, 'rviz', 'lio_show.rviz')
+        package_path, 'rviz', 'video.rviz')
     default_config_path = os.path.join(package_path, 'config')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
