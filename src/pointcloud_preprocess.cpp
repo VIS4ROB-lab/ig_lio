@@ -1,14 +1,15 @@
 #include "ig_lio/pointcloud_preprocess.h"
+
 #include "ig_lio/timer.h"
 
 extern Timer timer;
 
 void PointCloudPreprocess::Process(
     const livox_ros_driver2::msg::CustomMsg::SharedPtr msg,
-    pcl::PointCloud<PointType>::Ptr& cloud_out,
-    const double last_start_time) {
-  double time_offset =
-      (msg->header.stamp.sec + msg->header.stamp.nanosec * 1e-9  - last_start_time) * 1000.0;  // ms
+    pcl::PointCloud<PointType>::Ptr& cloud_out, const double last_start_time) {
+  double time_offset = (msg->header.stamp.sec +
+                        msg->header.stamp.nanosec * 1e-9 - last_start_time) *
+                       1000.0;  // ms
 
   for (size_t i = 1; i < msg->point_num; ++i) {
     if ((msg->points[i].line < num_scans_) &&
@@ -35,18 +36,18 @@ void PointCloudPreprocess::Process(
     const sensor_msgs::msg::PointCloud2::SharedPtr msg,
     pcl::PointCloud<PointType>::Ptr& cloud_out) {
   switch (config_.lidar_type) {
-  case LidarType::VELODYNE:
-    ProcessVelodyne(msg, cloud_out);
-    break;
-  case LidarType::OUSTER:
-    ProcessOuster(msg, cloud_out);
-    break;
-  case LidarType::HESAI:
-    ProcessHesai(msg, cloud_out);
-    break; 
-  default:
-    LOG(INFO) << "Error LiDAR Type!!!" << std::endl;
-    exit(0);
+    case LidarType::VELODYNE:
+      ProcessVelodyne(msg, cloud_out);
+      break;
+    case LidarType::OUSTER:
+      ProcessOuster(msg, cloud_out);
+      break;
+    case LidarType::HESAI:
+      ProcessHesai(msg, cloud_out);
+      break;
+    default:
+      LOG(INFO) << "Error LiDAR Type!!!" << std::endl;
+      exit(0);
   }
 }
 
@@ -130,8 +131,7 @@ void PointCloudPreprocess::ProcessVelodyne(
         yaw_last[layer] = yaw_angle;
         time_last[layer] = point.curvature;
       }
-      if(InRadius(point))
-        cloud_out->push_back(point);
+      if (InRadius(point)) cloud_out->push_back(point);
     }
   }
 }
@@ -155,8 +155,7 @@ void PointCloudPreprocess::ProcessOuster(
       point.intensity = cloud_origin.at(i).intensity;
       // ms
       point.curvature = cloud_origin.at(i).t * 1e-6;
-      if(InRadius(point))
-        cloud_out->push_back(point);
+      if (InRadius(point)) cloud_out->push_back(point);
     }
   }
 }
@@ -193,6 +192,8 @@ void PointCloudPreprocess::ProcessHesai(
 
   cloud_out->reserve(cloud_origin.size());
 
+  double time_head = cloud_origin.points[0].timestamp;
+
   for (size_t i = 0; i < cloud_origin.size(); ++i) {
     if ((i % config_.point_filter_num == 0) && !HasInf(cloud_origin.at(i)) &&
         !HasNan(cloud_origin.at(i))) {
@@ -206,7 +207,8 @@ void PointCloudPreprocess::ProcessHesai(
       point.intensity = cloud_origin.at(i).intensity;
       if (has_time_) {
         // curvature unit: ms
-        point.curvature = cloud_origin.at(i).timestamp* 1e-9 * config_.time_scale;
+        point.curvature = (cloud_origin.at(i).timestamp - time_head) * 1e-9 *
+                          config_.time_scale;
         // std::cout<<point.curvature<<std::endl;
         // if(point.curvature < 0){
         //     std::cout<<"time < 0 : "<<point.curvature<<std::endl;
@@ -241,16 +243,12 @@ void PointCloudPreprocess::ProcessHesai(
         yaw_last[layer] = yaw_angle;
         time_last[layer] = point.curvature;
       }
-      if(InRadius(point)){
+      if (InRadius(point)) {
         cloud_out->push_back(point);
       }
-        
     }
   }
 }
-
-
-
 
 template <typename T>
 inline bool PointCloudPreprocess::HasInf(const T& p) {
