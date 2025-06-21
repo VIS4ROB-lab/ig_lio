@@ -4,7 +4,7 @@ from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
 import yaml
-from launch.actions import IncludeLaunchDescription, ExecuteProcess,RegisterEventHandler
+from launch.actions import IncludeLaunchDescription, ExecuteProcess,RegisterEventHandler, TimerAction, Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
 from launch.event_handlers import OnProcessExit
@@ -40,11 +40,14 @@ def generate_launch_description():
     rviz_use = LaunchConfiguration('rviz')
     rviz_cfg = LaunchConfiguration('rviz_cfg')
     
-    ig_lio_node =   Node(
+    ig_lio_node = Node(
         package='ig_lio',
         executable='ig_lio_node',
         name='ig_lio_node',
         output='screen',
+        on_exit=[TimerAction(
+            period=10.0,
+            actions=[Shutdown()])],
         prefix=['nice -n 20'],
         parameters=[config_path, 
                     {'use_sim_time': use_sim_time}]
