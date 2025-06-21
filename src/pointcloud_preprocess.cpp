@@ -96,7 +96,8 @@ void PointCloudPreprocess::ProcessVelodyne(
       point.intensity = cloud_origin.at(i).intensity;
       if (has_time_) {
         // curvature unit: ms
-        point.curvature = cloud_origin.at(i).time * config_.time_scale;
+        point.curvature = (cloud_origin.at(i).time - cloud_origin.at(0).time) *
+                          config_.time_scale;
         // std::cout<<point.curvature<<std::endl;
         // if(point.curvature < 0){
         //     std::cout<<"time < 0 : "<<point.curvature<<std::endl;
@@ -192,8 +193,6 @@ void PointCloudPreprocess::ProcessHesai(
 
   cloud_out->reserve(cloud_origin.size());
 
-  double time_head = cloud_origin.points[0].timestamp;
-
   for (size_t i = 0; i < cloud_origin.size(); ++i) {
     if ((i % config_.point_filter_num == 0) && !HasInf(cloud_origin.at(i)) &&
         !HasNan(cloud_origin.at(i))) {
@@ -207,8 +206,9 @@ void PointCloudPreprocess::ProcessHesai(
       point.intensity = cloud_origin.at(i).intensity;
       if (has_time_) {
         // curvature unit: ms
-        point.curvature = (cloud_origin.at(i).timestamp - time_head) * 1e-9 *
-                          config_.time_scale;
+        point.curvature =
+            (cloud_origin.at(i).timestamp - cloud_origin.at(0).timestamp) *
+            config_.time_scale;
         // std::cout<<point.curvature<<std::endl;
         // if(point.curvature < 0){
         //     std::cout<<"time < 0 : "<<point.curvature<<std::endl;
