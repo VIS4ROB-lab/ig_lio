@@ -1,23 +1,22 @@
 
 
-
-
 #ifndef POINTCLOUD_PREPROCESS_H_
 #define POINTCLOUD_PREPROCESS_H_
+
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
+#include "point_type.h"  // Ensure this is compatible with ROS2
 
-#include "point_type.h" // Ensure this is compatible with ROS2
-
-// Assuming Livox ROS2 driver provides a similar message type or you have adapted it
-#include <livox_ros_driver2/msg/custom_msg.hpp>
-
+// Assuming Livox ROS2 driver provides a similar message type or you have
+// adapted it
 #include <glog/logging.h>
+
+#include <livox_ros_driver2/msg/custom_msg.hpp>
 
 enum class LidarType { LIVOX, VELODYNE, OUSTER, HESAI };
 
@@ -30,8 +29,9 @@ struct VelodynePointXYZIRT {
 } EIGEN_ALIGN16;
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     VelodynePointXYZIRT,
-    (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(
-        uint16_t, ring, ring)(float, time, time))
+    (float, x, x)(float, y, y)(float, z, z)(float, intensity,
+                                            intensity)(uint16_t, ring,
+                                                       ring)(float, time, time))
 
 struct HesaiPointXYZIRT {
   PCL_ADD_POINT4D;
@@ -52,16 +52,15 @@ struct OusterPointXYZIRT {
   uint32_t t;
   uint16_t reflectivity;
   uint8_t ring;
-  uint16_t noise;
   uint32_t range;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     OusterPointXYZIRT,
     (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(
-        uint32_t, t, t)(uint16_t, reflectivity, reflectivity)(
-        uint8_t, ring, ring)(uint16_t, noise, noise)(uint32_t, range, range))
-
+        uint32_t, t, t)(uint16_t, reflectivity,
+                        reflectivity)(uint8_t, ring, ring)(uint32_t, range,
+                                                           range))
 
 class PointCloudPreprocess {
  public:
@@ -79,8 +78,7 @@ class PointCloudPreprocess {
 
   PointCloudPreprocess() = delete;
 
-  PointCloudPreprocess(Config config = Config())
-      : config_(config) {}
+  PointCloudPreprocess(Config config = Config()) : config_(config) {}
 
   ~PointCloudPreprocess() = default;
 
@@ -107,7 +105,7 @@ class PointCloudPreprocess {
   void ProcessOuster(const sensor_msgs::msg::PointCloud2::SharedPtr msg,
                      pcl::PointCloud<PointType>::Ptr& cloud_out);
   void ProcessHesai(const sensor_msgs::msg::PointCloud2::SharedPtr msg,
-                       pcl::PointCloud<PointType>::Ptr& cloud_out);
+                    pcl::PointCloud<PointType>::Ptr& cloud_out);
   bool InRadius(const PointType& p) {
     double radius = p.x * p.x + p.y * p.y + p.z * p.z;
     return (radius < (config_.max_radius * config_.max_radius) &&
