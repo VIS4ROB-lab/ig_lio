@@ -49,10 +49,10 @@ Visualization Manager:
           Value: false
         odom_lidar:
           Value: false
-        os_lidar:
-          Value: false
         sensor_base:
           Value: true
+        vlp_lidar:
+          Value: false
       Marker Scale: 10
       Name: TF
       Show Arrows: false
@@ -64,7 +64,7 @@ Visualization Manager:
             odom_iglio:
               base_link:
                 imu_iglio:
-                  os_lidar:
+                  vlp_lidar:
                     sensor_base:
                       {}
                 lidar_iglio:
@@ -153,9 +153,9 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: true
       Max Color: 255; 255; 255
-      Max Intensity: 1087
+      Max Intensity: 92
       Min Color: 0; 0; 0
-      Min Intensity: 3
+      Min Intensity: 1
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: false
@@ -255,9 +255,9 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 15.886025428771973
-        Y: 10.490028381347656
-        Z: -1.7305784225463867
+        X: 17.973344802856445
+        Y: 4.314566135406494
+        Z: -0.7503447532653809
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -266,7 +266,7 @@ Visualization Manager:
       Pitch: 0.705202043056488
       Target Frame: odom_base
       Value: Orbit (rviz_default_plugins)
-      Yaw: 5.827877998352051
+      Yaw: 3.012873411178589
     Saved: ~
 Window Geometry:
   Displays:
