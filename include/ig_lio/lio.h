@@ -7,22 +7,18 @@
 #ifndef LIO_H_
 #define LIO_H_
 
-#include <deque>
-#include <numeric>
-#include <rclcpp/rclcpp.hpp>
-
-#include <sensor_msgs/msg/imu.hpp>
-
 #include <glog/logging.h>
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
-#include <sophus/so3.hpp>
-
 #include <pcl/common/transforms.h>
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_reduce.h>
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <deque>
+#include <numeric>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <sophus/so3.hpp>
 
 #include "ig_lio/faster_voxel_grid.h"
 #include "ig_lio/point_type.h"
@@ -51,7 +47,7 @@ struct SensorMeasurement {
 class LIO {
  public:
   struct Config {
-    Config(){};
+    Config() {};
 
     double init_ori_cov{1.0};
     double init_pos_cov{1.0};
@@ -81,9 +77,9 @@ class LIO {
   };
 
   LIO(Config config = Config())
-      : config_(config)
-      , cloud_cov_ptr_(new CloudCovType())
-      , cloud_DS_ptr_(new CloudType()) {
+      : config_(config),
+        cloud_cov_ptr_(new CloudCovType()),
+        cloud_DS_ptr_(new CloudType()) {
     fast_voxel_grid_ptr_ =
         std::make_shared<FasterVoxelGrid>(config_.current_scan_resolution);
 
@@ -100,8 +96,7 @@ class LIO {
   bool MeasurementUpdateForReloc(SensorMeasurement& sensor_measurement);
   Eigen::Matrix3d correctRotationMatrix(const Eigen::Matrix3d& R);
 
-  bool Predict(const double time,
-               const Eigen::Vector3d& acc_1,
+  bool Predict(const double time, const Eigen::Vector3d& acc_1,
                const Eigen::Vector3d& gyr_1);
 
   bool StaticInitialization(SensorMeasurement& sensor_measurement);
@@ -116,7 +111,6 @@ class LIO {
 
   bool IsInit() { return lio_init_; }
 
-  
   Eigen::Matrix4d GetCurrentPose() { return curr_state_.pose; }
 
   Eigen::Vector3d GetCurrentVel() { return curr_state_.vel; }
@@ -141,9 +135,6 @@ class LIO {
   static constexpr int IndexNoiseBiasAcc{12};
   static constexpr int IndexNoiseBiasGyr{15};
 
-
-
-
   struct PoseHistory {
     double time_ = 0.0;
     Eigen::Matrix4d T_ = Eigen::Matrix4d::Identity();
@@ -152,8 +143,6 @@ class LIO {
     Eigen::Vector3d un_gyr_ = Eigen::Vector3d::Zero();
   };
   std::deque<PoseHistory> pose_history_;  // for pointcloud
-
-
 
   struct Correspondence {
    public:
@@ -176,26 +165,21 @@ class LIO {
     Eigen::Vector3d bg = Eigen::Vector3d::Zero();
   };
 
-  bool NominalStateUpdate(const double dt,
-                          const Eigen::Vector3d& acc_0,
+  bool NominalStateUpdate(const double dt, const Eigen::Vector3d& acc_0,
                           const Eigen::Vector3d& acc_1,
                           const Eigen::Vector3d& gyr_0,
                           const Eigen::Vector3d& gyr_1,
                           const Eigen::Matrix4d& T_prev,
                           const Eigen::Vector3d& vel_prev,
-                          Eigen::Matrix4d& T_curr,
-                          Eigen::Vector3d& vel_curr,
-                          Eigen::Vector3d& un_acc,
-                          Eigen::Vector3d& un_gyr);
+                          Eigen::Matrix4d& T_curr, Eigen::Vector3d& vel_curr,
+                          Eigen::Vector3d& un_acc, Eigen::Vector3d& un_gyr);
 
-  bool ErrorStateUpdate(const double dt,
-                        const Eigen::Vector3d& acc_0,
+  bool ErrorStateUpdate(const double dt, const Eigen::Vector3d& acc_0,
                         const Eigen::Vector3d& acc_1,
                         const Eigen::Vector3d& gyr_0,
                         const Eigen::Vector3d& gyr_1);
 
-  bool UndistortPointCloud(const double bag_time,
-                           const double lidar_end_time,
+  bool UndistortPointCloud(const double bag_time, const double lidar_end_time,
                            CloudPtr& cloud_ptr);
 
   bool StepOptimize(const SensorMeasurement& sensor_measurement,
@@ -222,10 +206,8 @@ class LIO {
                     State& corrected_state);
 
   bool GNStep(const SensorMeasurement& sensor_measurement,
-              Eigen::Matrix<double, 15, 15>& H,
-              Eigen::Matrix<double, 15, 1>& b,
-              const double y0,
-              Eigen::Matrix<double, 15, 1>& delta_x);
+              Eigen::Matrix<double, 15, 15>& H, Eigen::Matrix<double, 15, 1>& b,
+              const double y0, Eigen::Matrix<double, 15, 1>& delta_x);
 
   Config config_;
 
@@ -266,7 +248,7 @@ class LIO {
   std::vector<std::pair<Eigen::Vector3d, Eigen::Vector3d>> imu_init_buff_;
   bool first_imu_frame_{true};
   size_t imu_init_count_{0};
-  size_t max_init_count_{20};
+  size_t max_init_count_{10};
 
   Eigen::Matrix4d last_keyframe_pose_ = Eigen::Matrix4d::Identity();
 
