@@ -529,14 +529,23 @@ class IG_LIO_NODE : public rclcpp::Node {
     static double lidar_mean_scantime = 0.0;
     static size_t lidar_scan_num = 0;
 
+    std::lock_guard<std::mutex> lock(buff_mutex);
+
+    if (!lidar_timestamp || !imu_timestamp) {
+      if (debug_) {
+        LOG(INFO) << "lidar or imu timestamp is not set" << std::endl;
+      }
+      cloud_buff.clear();
+      imu_buff.clear();
+      return false;
+    }
+
     if (cloud_buff.empty() || imu_buff.empty()) {
       if (debug_) {
         // LOG(WARNING) << "either imu or cloud is empty" << std::endl;
       }
       return false;
     }
-
-    std::lock_guard<std::mutex> lock(buff_mutex);
 
     double lidar_end_time = 0.0;
     if (!measurement_pushed) {
