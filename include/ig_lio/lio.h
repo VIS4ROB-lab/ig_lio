@@ -14,6 +14,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <boost/math/special_functions/sign.hpp>
 #include <deque>
 #include <numeric>
 #include <rclcpp/rclcpp.hpp>

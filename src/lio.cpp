@@ -966,6 +966,7 @@ bool LIO::StaticInitialization(SensorMeasurement& sensor_measurement) {
   // The roll and pitch are aligned with the direction of gravity, but the yaw
   // is random.
   Eigen::Vector3d z_axis = mean_acc_.normalized();
+  z_axis *= boost::math::sign(z_axis.z());  // ensure z_axis is pointing up
   Eigen::Vector3d e1(1, 0, 0);
   Eigen::Vector3d x_axis = e1 - z_axis * z_axis.transpose() * e1;
   x_axis.normalize();
@@ -977,8 +978,8 @@ bool LIO::StaticInitialization(SensorMeasurement& sensor_measurement) {
   init_R.block<3, 1>(0, 1) = y_axis;
   init_R.block<3, 1>(0, 2) = z_axis;
   Eigen::Quaterniond init_q(init_R);
-  curr_state_.pose.block<3, 3>(0, 0).setIdentity();
-  // = init_q.normalized().toRotationMatrix().transpose();
+  curr_state_.pose.block<3, 3>(0, 0) =
+      init_q.normalized().toRotationMatrix().transpose();
 
   Eigen::Vector3d init_ba = Eigen::Vector3d::Zero();
   ComputeMeanAndCovDiag(
