@@ -49,7 +49,7 @@ Visualization Manager:
           Value: false
         odom_lidar:
           Value: false
-        os_lidar:
+        qt64_lidar:
           Value: false
         sensor_base:
           Value: true
@@ -64,7 +64,7 @@ Visualization Manager:
             odom_iglio:
               base_link:
                 imu_iglio:
-                  os_lidar:
+                  qt64_lidar:
                     sensor_base:
                       {}
                 lidar_iglio:
@@ -153,9 +153,9 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: true
       Max Color: 255; 255; 255
-      Max Intensity: 2244
+      Max Intensity: 255
       Min Color: 0; 0; 0
-      Min Intensity: 12
+      Min Intensity: 5
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: false
@@ -263,10 +263,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8147974014282227
+      Pitch: 0.6447975635528564
       Target Frame: odom_base
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.9478756189346313
+      Yaw: 5.927887916564941
     Saved: ~
 Window Geometry:
   Displays:

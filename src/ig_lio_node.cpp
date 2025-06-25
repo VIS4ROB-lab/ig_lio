@@ -367,6 +367,7 @@ class IG_LIO_NODE : public rclcpp::Node {
     // parameters for EMA filter
     static double a = 0.8;
     static double b = 1.0 - a;
+    imu_count++;
 
     sensor_msgs::msg::Imu imu_msg = *msg_ptr;
     imu_timestamp =
@@ -424,6 +425,7 @@ class IG_LIO_NODE : public rclcpp::Node {
   // process Velodyne and Outser
   void CloudCallBack(const sensor_msgs::msg::PointCloud2::SharedPtr msg) {
     static double last_lidar_timestamp = 0.0;
+    lidar_count++;
     timer.Evaluate(
         [&]() {
           lidar_timestamp =
@@ -531,13 +533,10 @@ class IG_LIO_NODE : public rclcpp::Node {
 
     std::lock_guard<std::mutex> lock(buff_mutex);
 
-    if (!lidar_timestamp || !imu_timestamp) {
-      if (debug_) {
-        LOG(INFO) << "lidar or imu timestamp is not set" << std::endl;
-      }
-      cloud_buff.clear();
+    // Check if we have enough data
+    if (lidar_count < 10 || imu_count < 100) {
       imu_buff.clear();
-      return false;
+      cloud_buff.clear();
     }
 
     if (cloud_buff.empty() || imu_buff.empty()) {
@@ -1042,6 +1041,8 @@ class IG_LIO_NODE : public rclcpp::Node {
 
   // parameters used to synchronize livox time with the external imu
   double timediff_lidar_wrt_imu = 0.0;
+  long lidar_count = 0;
+  long imu_count = 0;
   double lidar_timestamp = 0.0;
   double imu_timestamp = 0.0;
   bool timediff_correct_flag;
