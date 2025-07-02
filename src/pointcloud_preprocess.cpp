@@ -96,12 +96,15 @@ void PointCloudPreprocess::ProcessVelodyne(
       point.intensity = cloud_origin.at(i).intensity;
       if (has_time_) {
         // curvature unit: ms
-        point.curvature = (cloud_origin.at(i).time - cloud_origin.at(0).time) *
-                          config_.time_scale;
-        // std::cout<<point.curvature<<std::endl;
-        // if(point.curvature < 0){
-        //     std::cout<<"time < 0 : "<<point.curvature<<std::endl;
-        // }
+        if (cloud_origin.at(i).time < 0.0) {
+          point.curvature = 0.0;
+        } else if (cloud_origin.at(i).time < 1.0) {
+          point.curvature = cloud_origin.at(i).time * config_.time_scale;
+        } else {
+          point.curvature =
+              (cloud_origin.at(i).time - cloud_origin.at(0).time) *
+              config_.time_scale;
+        }
       } else {
         int layer = cloud_origin.points[i].ring;
         double yaw_angle = atan2(point.y, point.x) * 57.2957;
