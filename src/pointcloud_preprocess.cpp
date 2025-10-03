@@ -97,13 +97,12 @@ void PointCloudPreprocess::ProcessVelodyne(
       if (has_time_) {
         // curvature unit: ms
         if (cloud_origin.at(i).time < 0.0) {
-          point.curvature = 0.0;
+          point.curvature = (0.1 + cloud_origin.at(i).time) * 1e3;
         } else if (cloud_origin.at(i).time < 1.0) {
-          point.curvature = cloud_origin.at(i).time * config_.time_scale;
+          point.curvature = cloud_origin.at(i).time * 1e3;
         } else {
           point.curvature =
-              (cloud_origin.at(i).time - cloud_origin.at(0).time) *
-              config_.time_scale;
+              (cloud_origin.at(i).time - cloud_origin.at(0).time) * 1e-3;
         }
       } else {
         int layer = cloud_origin.points[i].ring;
