@@ -18,7 +18,7 @@
 
 #include <livox_ros_driver2/msg/custom_msg.hpp>
 
-enum class LidarType { LIVOX, VELODYNE, OUSTER, HESAI };
+enum class LidarType { LIVOX, VELODYNE, OUSTER, HESAI, AVIA };
 
 struct VelodynePointXYZIRT {
   PCL_ADD_POINT4D;
@@ -32,6 +32,19 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(
     (float, x, x)(float, y, y)(float, z, z)(float, intensity,
                                             intensity)(uint16_t, ring,
                                                        ring)(float, time, time))
+
+struct LivoxPointXYZIRT {
+  PCL_ADD_POINT4D;
+  PCL_ADD_INTENSITY
+  uint8_t tag;
+  uint8_t line;
+  double timestamp;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+POINT_CLOUD_REGISTER_POINT_STRUCT(
+    LivoxPointXYZIRT,
+    (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(
+        uint8_t, tag, tag)(uint8_t, line, line)(double, timestamp, timestamp))
 
 struct HesaiPointXYZIRT {
   PCL_ADD_POINT4D;
@@ -101,7 +114,8 @@ class PointCloudPreprocess {
 
   void ProcessVelodyne(const sensor_msgs::msg::PointCloud2::SharedPtr msg,
                        pcl::PointCloud<PointType>::Ptr& cloud_out);
-
+  void ProcessLivox(const sensor_msgs::msg::PointCloud2::SharedPtr msg,
+                    pcl::PointCloud<PointType>::Ptr& cloud_out);
   void ProcessOuster(const sensor_msgs::msg::PointCloud2::SharedPtr msg,
                      pcl::PointCloud<PointType>::Ptr& cloud_out);
   void ProcessHesai(const sensor_msgs::msg::PointCloud2::SharedPtr msg,

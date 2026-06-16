@@ -62,6 +62,8 @@ class IG_LIO_NODE : public rclcpp::Node {
       lidar_type_ = LidarType::OUSTER;
     } else if (lidar_type_string == "livox") {
       lidar_type_ = LidarType::LIVOX;
+    } else if (lidar_type_string == "avia") {
+      lidar_type_ = LidarType::AVIA;
     } else if (lidar_type_string == "hesai") {
       lidar_type_ = LidarType::HESAI;
     } else {
